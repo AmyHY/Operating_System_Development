@@ -1,0 +1,132 @@
+Bug 1:
+    - who: yuehe4
+    - where: CP1 RTC
+    - what: RTC interrupt wouldn't show up
+    - solution: fixed by calling rtc_init() in kernel.c
+
+Bug 2:
+    - who: yuehe4
+    - where: CP1 RTC
+    - what: RTC interrupt only occurs once
+    - solution: fixed by reading register C (status register) after initializing RTC and also after rtc_handler
+
+Bug 3:
+    - who: junyig4
+    - where: CP1 Keyboard
+    - what: scancode is read from the wrong port
+    - solution: change port from MASTER_DATA to 0x60
+
+Bug 4:
+    - who: junyig4
+    - where: CP1 Keyboard
+    - what: characters are not showing up correctly
+    - solution: wrong format specifier for unsigned char in printf
+
+Bug 5:
+    - who: junyig4
+    - where: CP1 INIT_IDT
+    - what: compile errors of multiple definitions of functions in idt.c
+    - solution: removing idt.S file and moving the linkage assembly code into its own file (linkage.S / linkage.h)
+
+Bug 6:
+    - who: jialen2
+    - where: CP1 Paging
+    - what: Use 22 bits for the base address for a page directory entry for a page table, instead of 20 bits
+    - solution: Change the PAGE_TABLE_NUM_OFFSET to 12 from 10 in page.h. The base address for a page directory entry for a page table should be 20 bits, and only 10 bits are provided for the virtual memory as offset. The difference is because when the offset is retrieved, the offset will be times 4 for there's 4 Bytes.
+
+Bug 7:
+    - who: jialen2
+    - where: CP1 Paging
+    - what: Set video memeory to be from 0xB8000 - 0xBFFFF
+    - solution: Only set video memory in a 4KB block, which is 0xB8000 - 0xB9000
+
+Bug 8:
+    - who: jialen2
+    - where: CP1 Paging
+    - what: Set read only privilege to the kernel code block
+    - solution: The kernel code block should be both read and writable, so the read-write bit should be set to 1.
+
+Bug 9:
+    - who: jialen2
+    - where: CP2 File System
+    - what: Use the data block index in the inode as the direct address of the inode block.
+    - solution: Use the info in the inode as the data block index, and add to the data block start index to find the read addres. 
+
+Bug 10:
+    - who: yuehe4
+    - where: CP2 RTC
+    - what: rtc_write doesn't update the desired frequency
+    - solution: Initialize counter in log2-calculation to zero, so that it calculates the correct rate from the given frequency.
+
+Bug 11:
+    - who: junkai2
+    - where: CP2 Terminal
+    - what: set keyboard buffer to be static, making it impossible to access the updated buffer in terminal
+    - solution: remove static and do initialization in keyboard.c
+
+Bug 12:
+    - who: junyig4
+    - where: CP3 Execute
+    - what: problems with parsing the command
+    - solution: when initializing filename, clear all char to '\0'
+
+Bug 13:
+    - who: junyig4
+    - where: CP4 cat program
+    - what: when running cat frame0.txt, the fish does not display properly
+    - solution: 
+        1) read data is not properly returning; it should only return 0 when initial position is greater or equal to file_size
+        2) file_read is always reading at position 0, which cause the image to be repeatedly read each time. The position should be file_pos from the fd_array
+        3) terminal_write stops printing when reached '\n', remove this command
+
+Bug 14:
+    - who: jialen2
+    - where: CP3 Vidmap
+    - what: problems when accessing video memory
+    - solution: When setting up the page table, we define the page table on the stack. So after the function scope, the table was automaticlly deallocted, thus can't found the table in future memory translation.
+
+Bug 15:
+    - who: jialen2
+    - where: CP3 grep & cat
+    - what: Can't find the file "verylargetextwithverylongname.tx" because we read as many as strlen() from the dentry.
+    - solution: Check number of bytes strlen() reads. If larger than the max file name length, then omit the trailing part.
+
+Bug 16:
+
+    - who: junyig4
+
+    - where: CP5 page fault on halt
+
+    - what: page faulting after running programs such as hello and counter because we are using the wrong esp and ebp to return back to execute
+
+    - solution: save an additional execute esp and ebp that will not be changed by process switching
+
+
+
+Bug 17:
+
+    - who: junyig4
+
+    - where: CP5 enter key presses
+
+    - what: needing to press enter more than once for program to run
+
+    - solution: adding a condition in terminal read that ensures active term == visible term
+
+
+
+Bug 17:
+
+    - who: junyig4
+
+    - where: CP5 not displaying output correctly
+
+    - what: not writing to the background when visible != active terminal
+
+    - solution: adding an additional putc_diff function in lib.c which is then called when visible != active in terminal write
+
+
+
+
+
+    
